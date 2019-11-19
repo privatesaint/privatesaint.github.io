@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ZXing PDF417 example</title>
+    <script src="./BigInteger.min.js"></script>
+    <script src="./zxing-pdf417.js"></script>
+    <!-- <script src="//code.jquery.com/jquery-2.1.4.min.js"></script> -->
+    <!-- <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"
+    ></script> -->
+
+    <style>
+      body {
+        display: flex;
+        justify-content: space-between;
+      }
+      .col-6 {
+        display: flex;
+        flex-flow: column;
+        align-content: center;
+        border: 1px solid red;
+      }
+      .half {
+        width: 70%;
+        margin: auto;
+      }
+      img {
+        width: 100%;
+        height: auto;
+      }
+      .error {
+        font-weight: bold;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="col-6">
+      <video
+        id="videoele"
+        style="width: 400px; height: 300px;"
+        autoplay
+        playsinline
+      ></video>
+      <button type="button" id="btnele">Decode</button>
+      <div class="error"></div>
+      <pre class="decodedText"></pre>
+    </div>
+    <div class="col-6 half">
+      <img src="" id="img" />
+    </div>
+    <script>
+      const constraints = {
+        video: {
+          facingMode: "environment",
+          width: { min: 700 },
+          height: { min: 500 }
+        }
+      };
+      const video = document.getElementById("videoele");
+      const image = document.querySelector("#img");
+      const screenshotButton = document.getElementById("btnele");
+      function hasGetUserMedia() {
+        return !!(
+          navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+        );
+      }
+      if (hasGetUserMedia()) {
+        // Good to go!
+        navigator.mediaDevices
+          .getUserMedia(constraints)
+          .then(gotStream)
+          .catch(handleError);
+      } else {
+        alert("getUserMedia() is not supported by your browser");
+      }
+
+      function gotStream(stream) {
+        window.stream = stream; // make stream available to console
+        video.srcObject = stream;
+      }
+      function handleError(error) {
+        console.log(error);
+      }
+      screenshotButton.onclick = video.onclick = function() {
+        const canvas = document.createElement("canvas");
+        const canvas_context = canvas.getContext("2d");
+
+        document.querySelector(".error").innerHTML = "";
+        document.querySelector(".decodedText").innerHTML = "";
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        image.src = canvas.toDataURL("image/png");
+        try {
+          source = new ZXing.BitmapLuminanceSource(canvas_context, image);
+          binarizer = new ZXing.Common.HybridBinarizer(source);
+          bitmap = new ZXing.BinaryBitmap(binarizer);
+          const result = ZXing.PDF417.PDF417Reader.decode(bitmap, null, false);
+          console.log(result);
+          document.querySelector(".decodedText").innerHTML = JSON.stringify(
+            result,
+            null,
+            4
+          );
+        } catch (err) {
+          document.querySelector(".error").innerHTML = err;
+        }
+      };
+    </script>
+  </body>
+</html>
