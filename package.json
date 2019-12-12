@@ -1,0 +1,15 @@
+{
+  "name": "privatesaint.github.io-master",
+  "version": "1.0.0",
+  "description": "",
+  "main": "BigInteger.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parse-usdl": "^2.0.2"
+  }
+}
