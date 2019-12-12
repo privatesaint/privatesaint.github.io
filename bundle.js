@@ -58,7 +58,8 @@ screenshotButton.onclick = video.onclick = function() {
         );
       }
     } else {
-      console.log("upload a clearer picture");
+      document.querySelector(".decodedText").innerHTML =
+        "Please try again/Try with a clearer picture";
     }
   } catch (err) {
     document.querySelector(".error").innerHTML = err;
